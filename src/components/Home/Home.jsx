@@ -1,35 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PostCard from '../PostCard/PostCard';
-import { XMLParser } from 'fast-xml-parser';
-
-const toArray = (value) => {
-  if (Array.isArray(value)) return value;
-  if (value === undefined || value === null || value === '') return [];
-  return [value];
-};
-
-const normalizePost = (item) => {
-  const categories = toArray(item?.categories).length
-    ? toArray(item?.categories)
-    : toArray(item?.category);
-
-  const thumbnail =
-    item?.thumbnail ||
-    item?.['media:thumbnail']?.url ||
-    item?.['media:thumbnail']?.['@_url'] ||
-    '';
-
-  const content = item?.content || item?.description || item?.['content:encoded'] || '';
-
-  return {
-    ...item,
-    author: item?.author || item?.['dc:creator'] || '',
-    categories,
-    content,
-    description: item?.description || content,
-    thumbnail,
-  };
-};
 
 const Home = () => {
   const [postdata, setPostData] = useState([]);
@@ -37,17 +7,11 @@ const Home = () => {
 
   useEffect(() => {
     async function fetchData() {
-    const res = await fetch(
-      "https://corsproxy.io/?https://medium.com/feed/@tushardtar704"
-    );
-    const xml = await res.text();
-    const parser = new XMLParser();
-    const json = parser.parse(xml);
-    const channel = json?.rss?.channel || {};
-    const rawItems = toArray(channel?.item);
-    setPostData(rawItems.map(normalizePost));
-    setImage(channel?.image?.url || '');
-  }
+      const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@tushardtar704');
+      const data = await response.json();
+      setPostData(data.items);
+      setImage(data.feed.image);
+    }
     fetchData();
   }, []);
 
@@ -77,7 +41,7 @@ const Home = () => {
           
           <div className="animate-fade-up delay-300 mt-14 inline-flex flex-col sm:flex-row items-center gap-6 bg-card rounded-2xl border border-border p-6 shadow-sm">
             <img
-              src={image? image:"https://images.pexels.com/photos/9482193/pexels-photo-9482193.jpeg"}
+              src={image}
               alt="profile"
               className="h-20 w-20 rounded-full object-cover ring-2 ring-border-light"
             />
