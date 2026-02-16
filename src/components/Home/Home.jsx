@@ -1,19 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useLoaderData } from 'react-router-dom';
 import PostCard from '../PostCard/PostCard';
 
-const Home = () => {
-  const [postdata, setPostData] = useState([]);
-  const [image, setImage] = useState('');
 
-  useEffect(() => {
-    async function fetchData() {
-      const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@tushardtar704');
-      const data = await response.json();
-      setPostData(data.items);
-      setImage(data.feed.image);
-    }
-    fetchData();
-  }, []);
+
+const Home = () => {
+  const { postdata, image } = useLoaderData();
 
   return (
     <>
@@ -98,3 +90,18 @@ const Home = () => {
 };
 
 export default Home;
+
+export async function homeLoader() {
+  const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@tushardtar704');
+
+  if (!response.ok) {
+    throw new Response('Failed to load posts', { status: response.status });
+  }
+
+  const data = await response.json();
+
+  return {
+    postdata: data.items ?? [],
+    image: data.feed?.image ?? ''
+  };
+}
