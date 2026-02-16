@@ -77,7 +77,7 @@ const Home = () => {
           
           <div className="animate-fade-up delay-300 mt-14 inline-flex flex-col sm:flex-row items-center gap-6 bg-card rounded-2xl border border-border p-6 shadow-sm">
             <img
-              src={image}
+              src={image? image:"https://images.pexels.com/photos/9482193/pexels-photo-9482193.jpeg"}
               alt="profile"
               className="h-20 w-20 rounded-full object-cover ring-2 ring-border-light"
             />
